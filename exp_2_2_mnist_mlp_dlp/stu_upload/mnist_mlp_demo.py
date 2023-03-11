@@ -5,6 +5,12 @@ import numpy as np
 import struct
 import os
 
+MNIST_DIR = "../mnist_data"
+TRAIN_DATA = "train-images-idx3-ubyte"
+TRAIN_LABEL = "train-labels-idx1-ubyte"
+TEST_DATA = "t10k-images-idx3-ubyte"
+TEST_LABEL = "t10k-labels-idx1-ubyte"
+
 class MNIST_MLP(object):
     def __init__(self):
         # set up net
@@ -35,7 +41,16 @@ class MNIST_MLP(object):
         self.net.setInputShape(batch_size, input_size, 1, 1)
         # fc1
         self.net.createMlpLayer('fc1', hidden1, self.input_quant_params[0])
-        __________________
+        # relu
+        self.net.createReLuLayer('relu1')
+        # fc2
+        self.net.createMlpLayer('fc2', hidden2, self.input_quant_params[1])
+        # relu
+        self.net.createReLuLayer('relu2')
+        # fc3
+        self.net.createMlpLayer('fc3', self.out_classes, self.input_quant_params[2])
+        # softmax
+        self.net.createSoftmaxLayer('sf', axis=1)
     
     def load_mnist(self, file_dir, is_images = 'True'):
         # Read binary data
@@ -60,8 +75,8 @@ class MNIST_MLP(object):
     
     def load_data(self, data_path, label_path):
         print('Loading MNIST data from files...')
-        test_images = __________________
-        test_labels = __________________
+        test_images = self.load_mnist(os.path.join(MNIST_DIR, TEST_DATA), True)
+        test_labels = self.load_mnist(os.path.join(MNIST_DIR, TEST_LABEL), False)
         self.test_data = np.append(test_images, test_labels, axis=1)
 
     def load_model(self, param_dir):  # 加载参数
@@ -75,11 +90,11 @@ class MNIST_MLP(object):
         
         weigh2 = np.transpose(params['w2'], [1, 0]).flatten().astype(np.float64)
         bias2 = params['b2'].flatten().astype(np.float64)
-        __________________
+        self.net.loadParams(2, weigh2, bias2, self.filter_quant_params[1])
 
         weigh3 = np.transpose(params['w3'], [1, 0]).flatten().astype(np.float64)
         bias3 = params['b3'].flatten().astype(np.float64)
-        __________________
+        self.net.loadParams(4, weigh3, bias3, self.filter_quant_params[2])
     
     def forward(self):
         return self.net.forward()
