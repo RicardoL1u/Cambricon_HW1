@@ -53,8 +53,8 @@ class MNIST_MLP(object):
         print('Loading MNIST data from files...')
         train_images = self.load_mnist(os.path.join(MNIST_DIR, TRAIN_DATA), True)
         train_labels = self.load_mnist(os.path.join(MNIST_DIR, TRAIN_LABEL), False)
-        test_images = self.load_mnist(os.path.join(MNIST_DIR, TEST_DATA, True))
-        test_labels = self.load_mnist(os.path.join(MNIST_DIR, TEST_LABEL, False))
+        test_images = self.load_mnist(os.path.join(MNIST_DIR, TEST_DATA), True)
+        test_labels = self.load_mnist(os.path.join(MNIST_DIR, TEST_LABEL), False)
         self.train_data = np.append(train_images, train_labels, axis=1)
         self.test_data = np.append(test_images, test_labels, axis=1)
         # self.test_data = np.concatenate((self.train_data, self.test_data), axis=0)
@@ -146,7 +146,7 @@ class MNIST_MLP(object):
         print('Accuracy in test set: %f' % accuracy)
 
 def build_mnist_mlp(param_dir='weight.npy'):
-    h1, h2, e = 32, 16, 10
+    h1, h2, e = 32, 16, 30
     mlp = MNIST_MLP(hidden1=h1, hidden2=h2, max_epoch=e)
     mlp.load_data()
     mlp.build_model()
